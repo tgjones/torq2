@@ -38,6 +38,8 @@ const texture ElevationTexture;
 // the resolution of the elevation texture
 const texture NormalMapTexture;
 
+const texture CoarserNormalMapTexture;
+
 // position of viewer in world coordinates
 const float2 ViewerPos;
 
@@ -55,6 +57,12 @@ const float GridSize;
 
 // vector for the direction of sunlight
 const float3 LightDirection;
+
+const float2 CoarserNormalMapTextureOffset;
+
+const float NormalMapTextureSize;
+
+const float NormalMapTextureSizeInverse;
 
 
 //-----------------------------------------------------------------------------
@@ -77,8 +85,19 @@ sampler_state
 {
 	Texture = <NormalMapTexture>;
 	MipFilter = NONE;
-	MinFilter = POINT;
-	MagFilter = POINT;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+};
+
+sampler CoarserNormalMapSampler = 
+sampler_state
+{
+	Texture = <CoarserNormalMapTexture>;
+	MipFilter = NONE;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 };
@@ -126,26 +145,11 @@ VS_OUTPUT VS(VS_INPUT IN)
 	float zc = elevationFineCoarse.y;
 	float zd = zc - zf;
 	
-	// sample the vertex texture
-	/*float zf_zd = tex2Dlod(ElevationSampler, float4(uv, 0, 0));
-	
-	// unpack to obtain zf and zd = (zc - zf)
-	// zf is elevation data in current (fine) level
-	// zc is elevation data in coarser level
-	float zf = floor(zf_zd);
-	float zd = (frac(zf_zd) * 131072) - 65536; // (zd = zc - zf)*/
-	
 	// compute alpha (transition parameter) and blend elevation
 	float2 pos = IN.posxy + (FineBlockOrig2.xy * GridSize);
 	float2 alpha = clamp((abs(pos - ViewerPos) - AlphaOffset) * OneOverWidth, 0, 1);
-	//float2 alpha = clamp((abs(worldPos - ViewerPos) - AlphaOffset) * OneOverWidth, 0, 1);
 	alpha.x = max(alpha.x, alpha.y);
 	float z = zf + (alpha.x * zd);
-	//z = zf;
-	//z = z * 100.0f;
-	//z = uv.x * 5.0f;
-	//z = alpha.x;
-	//z = 0;
 	
 	// transform position to screen space
 	OUT.position = mul(WorldViewProjection, float4(worldPos, z, 1));
@@ -163,37 +167,25 @@ PS_OUTPUT PS(VS_OUTPUT IN)
 {
 	PS_OUTPUT OUT;
 	
-	// do a texture lookup to get the normal
-	float4 normalfc = tex2D(NormalMapSampler, IN.uv - 0.0f * FineBlockOrig.xy);
+	// get fine normal
+	float2 normalf = tex2D(NormalMapSampler, IN.uv).xy;
 	
-	// normalfc.xy contains normal at current (fine) level
-	// normalfc.zw contains normal at coarser level
-	// blend normals using alpha computed in vertex shader
-	//float3 normal = float3(((1 - IN.alpha.x) * normalfc.xy) + (IN.alpha.x * normalfc.zw), 1.0);
-	float3 normal = float3(normalfc.xy, 1);
-	//float3 normal = normalfc.xyz;
+	// get coarse normal
+	float2 texcoordc = ((IN.uv * NormalMapTextureSize) / 2.0) + CoarserNormalMapTextureOffset;
+	texcoordc *= NormalMapTextureSizeInverse;
+	float2 normalc = tex2D(CoarserNormalMapSampler, texcoordc).xy;
+	
+	float3 normal = float3(((1 - IN.alpha.x) * normalf) + (IN.alpha.x * normalc), 1.0);
 
-	// unpack coordinates from [0, 1] to [-1, 1] range, and renormalize
-	//normal = normalize(normal * 2 - 1);
+	// renormalize
 	normal = normalize(normal);
 	
 	// compute simple diffuse lighting
 	float s = clamp(dot(normal, LightDirection), 0, 1);
-	float4 ambient = float4(0.7f, 0.7f, 0.7f, 1);
-	OUT.colour = float4(s, s, s, 1) * 0.3f + ambient * 0.7f;
-	//OUT.colour = float4(normalfc.xyz, 1);
-	//OUT.colour = float4(s, s, s, 1);
-	//OUT.colour = ambient;
-	//OUT.colour = float4(IN.alpha.x, 0, 0, 1);
+	float4 ambient = float4(0.7f, 0.7f, 0.8f, 1);
+	float4 material = float4(0.4f, 0.5f, 0.4f, 1);
+	OUT.colour = float4(s, s, s, 1) * 0.2f + ambient * 0.1f + material * 0.7f;
 
-	//OUT.colour = IN.colour;
-	//OUT.colour = Shading * OUT.colour;
-	//OUT.colour = float4(0, 0, 0, 1);
-	//OUT.colour = float4(IN.uv.x, 0, 0, 1);
-	//OUT.colour = IN.colour;
-	//OUT.colour = float4(normalfc.x, 0, 0, 1);
-	//OUT.colour = float4(0, 0, 0, 1);
-	
 	return OUT;
 }
 
@@ -223,7 +215,7 @@ technique
 	/*pass Pass1
 	{
 		FillMode = WIREFRAME;
-		ZEnable = false;
+		//ZEnable = false;
 		
 		VertexShader = compile vs_3_0 VS();
 		PixelShader = compile ps_2_0 PS_2();

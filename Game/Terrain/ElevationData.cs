@@ -33,7 +33,8 @@ namespace Torq2.Terrain
 
 		public ElevationData(Game pGame, GraphicsDevice pGraphicsDevice, string sHeightMapFilename)
 		{
-			m_pHeightTexture = Texture2D.FromFile(pGraphicsDevice, sHeightMapFilename + ".png");
+			m_pHeightTexture = Importers.Tiff.TiffLoader.FromFile(pGraphicsDevice, sHeightMapFilename + ".tif");
+			//m_pHeightTexture = Texture2D.FromFile(pGraphicsDevice, sHeightMapFilename + ".png");
 			//m_pHeightTexture.Save("test.dds", ImageFileFormat.Dds);
 			// load heightmap into array
 			//m_pHeightTexture = AssetLoader.LoadAsset<Texture2D>(sHeightMapFilename, pGame, pGraphicsDevice);

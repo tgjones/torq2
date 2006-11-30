@@ -91,7 +91,7 @@ namespace Torq2.Graphics.Cameras
 
 			#endif
 
-			if (pGamePadState.IsConnected)
+			if (pGamePadState.IsConnected && pGamePadState.Buttons.LeftShoulder == ButtonState.Released)
 			{
 				// look left and right
 				m_fYaw -= pGamePadState.ThumbSticks.Right.X * GAMEPAD_ROTATION_SPEED * fDeltaTime;
@@ -160,15 +160,26 @@ namespace Torq2.Graphics.Cameras
 
 			if (pGamePadState.IsConnected)
 			{
-				// strafe left and right
-				Vector3 tMovement = new Vector3(GAMEPAD_TRANSLATION_SPEED, 0, 0);
-				tMovement = Vector3.Transform(tMovement, tRotationMatrix);
-				m_tPosition -= -tMovement * pGamePadState.ThumbSticks.Left.X * fDeltaTime;
+				if (pGamePadState.Buttons.LeftShoulder == ButtonState.Released)
+				{
+					// strafe left and right
+					Vector3 tMovement = new Vector3(GAMEPAD_TRANSLATION_SPEED, 0, 0);
+					tMovement = Vector3.Transform(tMovement, tRotationMatrix);
+					m_tPosition -= -tMovement * pGamePadState.ThumbSticks.Left.X * fDeltaTime;
 
-				// move forward and backward
-				tMovement = new Vector3(0, GAMEPAD_TRANSLATION_SPEED, 0);
-				tMovement = Vector3.Transform(tMovement, tRotationMatrix);
-				m_tPosition += tMovement * pGamePadState.ThumbSticks.Left.Y * fDeltaTime;
+					// move forward and backward
+					tMovement = new Vector3(0, GAMEPAD_TRANSLATION_SPEED, 0);
+					tMovement = Vector3.Transform(tMovement, tRotationMatrix);
+					m_tPosition += tMovement * pGamePadState.ThumbSticks.Left.Y * fDeltaTime;
+				}
+
+				// use left shoulder button and right stick to "zoom"
+				if (pGamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
+				{
+					Vector3 tMovement = new Vector3(0, GAMEPAD_TRANSLATION_SPEED * 10.0f, 0);
+					tMovement = Vector3.Transform(tMovement, tRotationMatrix);
+					m_tPosition += tMovement * pGamePadState.ThumbSticks.Right.Y * fDeltaTime;
+				}
 			}
 
 			// calculate the direction vector for the camera

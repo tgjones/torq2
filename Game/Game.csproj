@@ -74,6 +74,14 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>ScriptedCamera</Name>
     </Compile>
+    <Compile Include="Importers\Tiff\TiffFile.cs">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Name>TiffFile</Name>
+    </Compile>
+    <Compile Include="Importers\Tiff\TiffLoader.cs">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Name>TiffLoader</Name>
+    </Compile>
     <Compile Include="Torq2Game.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>Torq2Game</Name>
@@ -203,11 +211,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Terrains\Terragen 1.png">
+    <Content Include="Content\Terrains\SimpleLoop.tif">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
-      <Importer>TextureImporter</Importer>
-      <Processor>SpriteTextureProcessor</Processor>
-      <Name>Terragen 1</Name>
+      <Name>SimpleLoop</Name>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

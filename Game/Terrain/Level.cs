@@ -158,7 +158,7 @@ namespace Torq2.Terrain
 				Settings.NORMAL_MAP_TEXTURE_SIZE,
 				Settings.NORMAL_MAP_TEXTURE_SIZE,
 				1,
-				SurfaceFormat.HalfVector4);
+				SurfaceFormat.HalfVector2);
 
 			VertexDeclaration pNormalMapVertexDeclaration = new VertexDeclaration(pGraphicsDevice, TextureVertex.VertexElements);
 
@@ -290,13 +290,13 @@ namespace Torq2.Terrain
 		private void RenderElevationTexture(EffectWrapper pEffect)
 		{
 			float fMinVertexX = 0.0f;
-			float fMaxVertexX = Settings.ELEVATION_TEXTURE_SIZE - 1;
-			float fMinVertexY = Settings.ELEVATION_TEXTURE_SIZE - 1;
+			float fMaxVertexX = Settings.ELEVATION_TEXTURE_SIZE;
+			float fMinVertexY = Settings.ELEVATION_TEXTURE_SIZE;
 			float fMaxVertexY = 0.0f;
 
 			TextureVertex[] pVertices = new TextureVertex[4];
 
-			float fOffsetX = Settings.GRID_SIZE_N * m_nGridSpacing;
+			float fOffsetX = (Settings.GRID_SIZE_N + 1) * m_nGridSpacing;
 			float fOffsetY = fOffsetX;
 
 			// (-1, -1)
@@ -322,13 +322,15 @@ namespace Torq2.Terrain
 
 		#endregion
 
+		#region Update normal map texture methods
+
 		private void UpdateNormalMapTexture(GraphicsDevice pGraphicsDevice)
 		{
 			RenderTarget2D pSavedSurface = (RenderTarget2D) pGraphicsDevice.GetRenderTarget(0);
 
 			pGraphicsDevice.SetRenderTarget(0, m_pNormalMapTexture);
 
-			pGraphicsDevice.Clear(Color.White);
+			pGraphicsDevice.Clear(Color.Black);
 
 			Matrix tWorld = Matrix.Identity;
 			Matrix tView = Matrix.Identity;
@@ -361,13 +363,7 @@ namespace Torq2.Terrain
 			// render to texture here
 			m_pNormalMapUpdateEffect.SetValue("ElevationTexture", m_pElevationTexture.GetTexture());
 			m_pNormalMapUpdateEffect.SetValue("ElevationTextureSizeInverse", Settings.ELEVATION_TEXTURE_SIZE_INVERSE);
-			m_pNormalMapUpdateEffect.SetValue("GridSpacing", (float) m_nGridSpacing);
-			//m_pNormalMapUpdateEffect.SetValue("NormalScaleFactor", new Vector2(1 / Maths.Sqrt(2 * m_nGridSpacing * m_nGridSpacing)));
 			m_pNormalMapUpdateEffect.SetValue("NormalScaleFactor", new Vector2(0.5f / (float)m_nGridSpacing));
-			m_pNormalMapUpdateEffect.SetValue("CoarserNormalMapTextureOffset", tCoarserGridPosMin);
-			m_pNormalMapUpdateEffect.SetValue("CoarserNormalMapTexture", (m_pNextCoarserLevel != null) ? m_pNextCoarserLevel.NormalMapTexture : null);
-			m_pNormalMapUpdateEffect.SetValue("NormalMapTextureSizeInverse", Settings.NORMAL_MAP_TEXTURE_SIZE_INVERSE);
-			m_pNormalMapUpdateEffect.SetValue("GridSize", Settings.GRID_SIZE_N);
 			m_pNormalMapUpdateEffect.Render(new RenderCallback(RenderNormalMapTexture));
 
 			pGraphicsDevice.ResolveRenderTarget(0);
@@ -380,26 +376,22 @@ namespace Torq2.Terrain
 		private void RenderNormalMapTexture(EffectWrapper pEffect)
 		{
 			float fMinVertexX = 0.0f;
-			float fMaxVertexX = Settings.NORMAL_MAP_TEXTURE_SIZE - (Settings.NORMAL_MAP_TEXTURE_SIZE / Settings.ELEVATION_TEXTURE_SIZE) - 1;
-			//float fMaxVertexX = Settings.NORMAL_MAP_TEXTURE_SIZE - (Settings.NORMAL_MAP_TEXTURE_SIZE / Settings.ELEVATION_TEXTURE_SIZE);
+			float fMaxVertexX = Settings.NORMAL_MAP_TEXTURE_SIZE - 1;
 			float fMinVertexY = fMaxVertexX;
 			float fMaxVertexY = 0.0f;
 
 			TextureVertex[] pVertices = new TextureVertex[4];
 
-			float fOffsetX = Settings.GRID_SIZE_N_MINUS_ONE + 0.5f;
-			//float fOffsetX = Settings.GRID_SIZE_N_MINUS_ONE;
+			float fOffsetX = Settings.GRID_SIZE_N + 0.5f;
 			float fOffsetY = fOffsetX;
 
 			// (-1, -1)
 			pVertices[0] = new TextureVertex(new Vector2(fMinVertexX, fMinVertexY),
 				new Vector2(0.5f, fOffsetY));
-				//new Vector2(0.0f, fOffsetY));
 
 			// (-1, 1)
 			pVertices[1] = new TextureVertex(new Vector2(fMinVertexX, fMaxVertexY),
 				new Vector2(0.5f));
-				//new Vector2(0.0f));
 
 			// (1, -1)
 			pVertices[2] = new TextureVertex(new Vector2(fMaxVertexX, fMinVertexY),
@@ -408,12 +400,13 @@ namespace Torq2.Terrain
 			// (1, 1)
 			pVertices[3] = new TextureVertex(new Vector2(fMaxVertexX, fMaxVertexY),
 				new Vector2(fOffsetX, 0.5f));
-				//new Vector2(fOffsetX, 0.0f));
 
 			pEffect.GraphicsDevice.DrawUserPrimitives<TextureVertex>(
 				PrimitiveType.TriangleStrip,
 				pVertices, 0, 2);
 		}
+
+		#endregion
 
 		public void Render(EffectWrapper pEffect)
 		{
@@ -421,15 +414,36 @@ namespace Torq2.Terrain
 			pEffect.SetValue("ElevationTexture", m_pElevationTexture.GetTexture());
 
 			pEffect.SetValue("ViewerPos", (m_pParentTerrain.Viewer.Position2D - m_tPositionMin) / m_nGridSpacing);
-			/*Vector2 tViewerPos = m_pParentTerrain.Viewer.Position2D;
-			tViewerPos.X = Maths.Floor(tViewerPos.X);
-			tViewerPos.Y = Maths.Floor(tViewerPos.Y);
-			pEffect.SetValue("ViewerPos", tViewerPos);*/
 			pEffect.SetValue("AlphaOffset", Settings.AlphaOffset);
 			pEffect.SetValue("OneOverWidth", Settings.TransitionWidthInverse);
 			pEffect.SetValue("GridSize", Settings.GRID_SIZE_N);
 
 			pEffect.SetValue("NormalMapTexture", m_pNormalMapTexture.GetTexture());
+			// calculate min and max position of level, in coordinates of coarser level grid
+			Vector2 tCoarserGridPosMin = new Vector2();
+			if (m_pNextCoarserLevel != null)
+			{
+				switch (m_pNextCoarserLevel.m_pInteriorTrim.ActiveInteriorTrim)
+				{
+					case InteriorTrim.WhichInteriorTrim.BottomLeft:
+						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M);
+						break;
+					case InteriorTrim.WhichInteriorTrim.BottomRight:
+						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE, Settings.BLOCK_SIZE_M);
+						break;
+					case InteriorTrim.WhichInteriorTrim.TopLeft:
+						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M_MINUS_ONE);
+						break;
+					case InteriorTrim.WhichInteriorTrim.TopRight:
+						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE);
+						break;
+				}
+			}
+			pEffect.SetValue("CoarserNormalMapTextureOffset", tCoarserGridPosMin);
+			pEffect.SetValue("CoarserNormalMapTexture", (m_pNextCoarserLevel != null) ? m_pNextCoarserLevel.NormalMapTexture : null);
+			pEffect.SetValue("NormalMapTextureSizeInverse", Settings.NORMAL_MAP_TEXTURE_SIZE_INVERSE);
+			pEffect.SetValue("NormalMapTextureSize", Settings.NORMAL_MAP_TEXTURE_SIZE);
+
 			pEffect.SetValue("LightDirection", Vector3.Normalize(new Vector3(0.0f, 0.0f, 1)));
 
 			#region Render blocks

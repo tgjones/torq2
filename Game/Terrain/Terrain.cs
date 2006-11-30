@@ -75,7 +75,7 @@ namespace Torq2.Terrain
 				@"Content\Effects\Terrain",
 				pVertexDeclaration);
 
-			m_pElevationData = new ElevationData(this.Game, m_pGraphicsDevice, @"Content\Terrains\Terragen 1");
+			m_pElevationData = new ElevationData(this.Game, m_pGraphicsDevice, @"Content\Terrains\SimpleLoop");
 
 			for (int i = 0, length = m_pLevels.Length; i < length; i++)
 			{
@@ -90,9 +90,8 @@ namespace Torq2.Terrain
 				pLevel.Create(m_pGraphicsDevice, pNextFinerLevel, pNextCoarserLevel, (IntVector2) m_pViewer.Position2D);
 			}
 
-			for (int i = 0, length = m_pLevels.Length; i < length; i++)
+			foreach (Level pLevel in m_pLevels)
 			{
-				Level pLevel = m_pLevels[i];
 				pLevel.Create2(m_pGraphicsDevice);
 			}
 
