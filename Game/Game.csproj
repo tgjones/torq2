@@ -82,6 +82,10 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>TiffLoader</Name>
     </Compile>
+    <Compile Include="Terrain\EdgeStitches.cs">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Name>EdgeStitches</Name>
+    </Compile>
     <Compile Include="Torq2Game.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>Torq2Game</Name>

@@ -48,23 +48,16 @@ namespace Torq2
 		/// </summary>
 		protected override void Initialize()
 		{
-			// 
-			// graphics
-			// 
 			this.graphics.PreferredBackBufferHeight = Settings.SCREEN_WIDTH;
 			this.graphics.PreferredBackBufferWidth = Settings.SCREEN_HEIGHT;
 			this.graphics.SynchronizeWithVerticalRetrace = false;
 			this.graphics.PreferMultiSampling = false;
-			// 
-			// framerate1
-			// 
+
 			this.framerate1.Enabled = true;
 			this.framerate1.FixedFormatDisplay = false;
 			this.framerate1.ShowDecimals = false;
 			this.framerate1.Visible = true;
-			// 
-			// GeoClipMappingGame
-			// 
+
 			this.IsFixedTimeStep = false;
 
 			terrain.Viewer = cube1;

@@ -33,7 +33,7 @@ uniform sampler HeightMapSampler = sampler_state
 struct VS_INPUT
 {
 	float2 posxy    : POSITION0;
-	float2 worldPos  : TEXCOORD0;
+	float2 worldPos : TEXCOORD0;
 };
 
 struct VS_OUTPUT
@@ -135,14 +135,7 @@ PS_OUTPUT UpdateElevationFromHeightMapPS(PS_INPUT input)
 			float2(texcoords.x, texcoords.y - (GridSpacing * HeightMapSizeInverse)));
 	}
 	
-	//float zd = zc - zf;
-	
-	// pack the signed difference zd into the fractional component
-	//float zf_zd = zf + ((zd + 65536) / 131072);
-	
-	//output.colour = float4(zf_zd, 0, 0, 1);
 	output.colour = float4(zf, zc, 0, 1);
-	//output.colour = float4(zf / 255.0f, 0, 0, 1);
 	
 	return output;
 }
@@ -154,12 +147,12 @@ PS_OUTPUT UpdateElevationFromHeightMapPS(PS_INPUT input)
 
 technique UpdateElevationFromHeightMap
 {
-    pass P0
-    {
-				AlphaBlendEnable = false;
-				
-        VertexShader = compile vs_3_0 UpdateElevationFromHeightMapVS();
-        PixelShader  = compile ps_3_0 UpdateElevationFromHeightMapPS();
-    }
+	pass P0
+	{
+		AlphaBlendEnable = false;
+
+		VertexShader = compile vs_3_0 UpdateElevationFromHeightMapVS();
+		PixelShader  = compile ps_3_0 UpdateElevationFromHeightMapPS();
+	}
 }
 

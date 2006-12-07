@@ -46,7 +46,7 @@ namespace Torq2.Graphics.Cameras
 			const float PROJECTION_BOTTOM = -0.5f;
 			const float PROJECTION_TOP = 0.5f;
 			const float PROJECTION_NEAR = 1.0f;
-			const float PROJECTION_FAR = 10000.0f;
+			const float PROJECTION_FAR = 30000.0f;
 
 			m_tProjection = Matrix.CreatePerspectiveOffCenter(
 				PROJECTION_LEFT,

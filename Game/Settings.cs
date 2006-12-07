@@ -156,6 +156,21 @@ namespace Torq2
 		public const short RING_FIXUPS_NUM_VERTICES = BLOCK_SIZE_M * 3 * 4;
 
 		/// <summary>
+		/// 
+		/// </summary>
+		public const short EDGE_STITCHES_NUM_INDICES = (GRID_SIZE_N * 4) + 1;
+
+		/// <summary>
+		/// This is used when rendering; it's set as a const just for optimisation.
+		/// </summary>
+		public const short EDGE_STITCHES_NUM_PRIMITIVES = EDGE_STITCHES_NUM_INDICES - 2;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public const short EDGE_STITCHES_NUM_VERTICES = (GRID_SIZE_N_MINUS_ONE * 4) + 1;
+
+		/// <summary>
 		/// This will depend on whether we use triangle lists or strips. Currently we're
 		/// using strips, just to be consistent, but it's not necessarily the most efficient
 		/// method.

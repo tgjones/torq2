@@ -22,6 +22,7 @@ namespace Torq2.Terrain
 		private InteriorTrim m_pInteriorTrim;
 		private Block[] m_pCentreBlocks;
 		private InteriorTrim m_pCentreInteriorTrim;
+		private EdgeStitches m_pEdgeStitches;
 
 		private Level m_pNextFinerLevel;
 		private bool m_bFinestLevel;
@@ -70,6 +71,11 @@ namespace Torq2.Terrain
 			get { return m_pNormalMapTexture.GetTexture(); }
 		}
 
+		private InteriorTrim InteriorTrim
+		{
+			get { return m_pInteriorTrim; }
+		}
+
 		#endregion
 
 		#region Constructor
@@ -108,6 +114,8 @@ namespace Torq2.Terrain
 
 			m_pCentreInteriorTrim = new InteriorTrim(m_nGridSpacing);
 
+			m_pEdgeStitches = new EdgeStitches(m_nGridSpacing);
+
 			m_bActive = true;
 		}
 
@@ -137,6 +145,8 @@ namespace Torq2.Terrain
 			}
 
 			m_pCentreInteriorTrim.Create(pGraphicsDevice);
+
+			m_pEdgeStitches.Create(pGraphicsDevice);
 
 			m_pNextFinerLevel = pNextFinerLevel;
 			m_pNextCoarserLevel = pNextCoarserLevel;
@@ -216,6 +226,8 @@ namespace Torq2.Terrain
 			m_pRingFixups.Update(tPositionMin);
 
 			m_pInteriorTrim.Update(tPositionMin, tViewerPosGridCoords);
+
+			m_pEdgeStitches.Update(tPositionMin);
 
 			// if this is the finest active level, we need to fill the hole with more blocks
 			if (m_pNextFinerLevel == null || !m_pNextFinerLevel.Active)
@@ -339,27 +351,6 @@ namespace Torq2.Terrain
 
 			m_pNormalMapUpdateEffect.SetValue("WorldViewProjection", Matrix.Transpose(tProjection));
 
-			// calculate min and max position of level, in coordinates of coarser level grid
-			Vector2 tCoarserGridPosMin = new Vector2();
-			if (m_pNextCoarserLevel != null)
-			{
-				switch (m_pNextCoarserLevel.m_pInteriorTrim.ActiveInteriorTrim)
-				{
-					case InteriorTrim.WhichInteriorTrim.BottomLeft:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M);
-						break;
-					case InteriorTrim.WhichInteriorTrim.BottomRight:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE, Settings.BLOCK_SIZE_M);
-						break;
-					case InteriorTrim.WhichInteriorTrim.TopLeft:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M_MINUS_ONE);
-						break;
-					case InteriorTrim.WhichInteriorTrim.TopRight:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE);
-						break;
-				}
-			}
-
 			// render to texture here
 			m_pNormalMapUpdateEffect.SetValue("ElevationTexture", m_pElevationTexture.GetTexture());
 			m_pNormalMapUpdateEffect.SetValue("ElevationTextureSizeInverse", Settings.ELEVATION_TEXTURE_SIZE_INVERSE);
@@ -419,27 +410,12 @@ namespace Torq2.Terrain
 			pEffect.SetValue("GridSize", Settings.GRID_SIZE_N);
 
 			pEffect.SetValue("NormalMapTexture", m_pNormalMapTexture.GetTexture());
-			// calculate min and max position of level, in coordinates of coarser level grid
+
 			Vector2 tCoarserGridPosMin = new Vector2();
 			if (m_pNextCoarserLevel != null)
-			{
-				switch (m_pNextCoarserLevel.m_pInteriorTrim.ActiveInteriorTrim)
-				{
-					case InteriorTrim.WhichInteriorTrim.BottomLeft:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M);
-						break;
-					case InteriorTrim.WhichInteriorTrim.BottomRight:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE, Settings.BLOCK_SIZE_M);
-						break;
-					case InteriorTrim.WhichInteriorTrim.TopLeft:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M_MINUS_ONE);
-						break;
-					case InteriorTrim.WhichInteriorTrim.TopRight:
-						tCoarserGridPosMin = new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE);
-						break;
-				}
-			}
+				tCoarserGridPosMin = m_pNextCoarserLevel.InteriorTrim.CoarserGridPosMin;
 			pEffect.SetValue("CoarserNormalMapTextureOffset", tCoarserGridPosMin);
+
 			pEffect.SetValue("CoarserNormalMapTexture", (m_pNextCoarserLevel != null) ? m_pNextCoarserLevel.NormalMapTexture : null);
 			pEffect.SetValue("NormalMapTextureSizeInverse", Settings.NORMAL_MAP_TEXTURE_SIZE_INVERSE);
 			pEffect.SetValue("NormalMapTextureSize", Settings.NORMAL_MAP_TEXTURE_SIZE);
@@ -502,6 +478,16 @@ namespace Torq2.Terrain
 
 				m_pCentreInteriorTrim.Render(pEffect);
 			}
+
+			#endregion
+
+			#region Render edge stitches
+
+			pEffect.SetValue("FineBlockOrig", new Vector4(Settings.ELEVATION_TEXTURE_SIZE_INVERSE, Settings.ELEVATION_TEXTURE_SIZE_INVERSE, 0.0f, 0.0f));
+			pEffect.SetValue("FineBlockOrig2", Vector2.Zero);
+			pEffect.SetValue("Shading", new Vector4(0.7f, 0.7f, 0.0f, 1.0f));
+
+			m_pEdgeStitches.Render(pEffect);
 
 			#endregion
 		}

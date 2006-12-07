@@ -28,6 +28,27 @@ namespace Torq2.Terrain
 			set { m_eActiveInteriorTrim = value; }
 		}
 
+		public Vector2 CoarserGridPosMin
+		{
+			get
+			{
+				// calculate min and max position of level, in coordinates of coarser level grid
+				switch (m_eActiveInteriorTrim)
+				{
+					case InteriorTrim.WhichInteriorTrim.BottomLeft:
+						return new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M);
+					case InteriorTrim.WhichInteriorTrim.BottomRight:
+						return new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE, Settings.BLOCK_SIZE_M);
+					case InteriorTrim.WhichInteriorTrim.TopLeft:
+						return new Vector2(Settings.BLOCK_SIZE_M, Settings.BLOCK_SIZE_M_MINUS_ONE);
+					case InteriorTrim.WhichInteriorTrim.TopRight:
+						return new Vector2(Settings.BLOCK_SIZE_M_MINUS_ONE);
+					default :
+						return Vector2.Zero;
+				}
+			}
+		}
+
 		#endregion
 
 		#region Constructors

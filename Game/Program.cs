@@ -2,16 +2,16 @@ using System;
 
 namespace Torq2
 {
-	static class Program
+	public static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
-		static void Main(string[] args)
+		public static void Main(string[] pArgs)
 		{
-			using (Torq2Game game = new Torq2Game())
+			using (Torq2Game pGame = new Torq2Game())
 			{
-				game.Run();
+				pGame.Run();
 			}
 		}
 	}
