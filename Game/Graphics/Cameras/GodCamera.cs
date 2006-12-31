@@ -38,7 +38,7 @@ namespace Torq2.Graphics.Cameras
 			m_fPitch = 0;
 			m_fYaw = 0;
 
-			m_tPosition = new Vector3(10, 10, 140);
+			m_tPosition = new Vector3(-2, -5, 6);
 			m_tLookAt = new Vector3(0, 0, 0);
 			m_tUp = new Vector3(0, 0, 1);
 

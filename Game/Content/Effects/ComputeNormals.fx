@@ -21,8 +21,8 @@ uniform sampler ElevationSampler = sampler_state
     MipFilter = NONE;
     MinFilter = POINT;
     MagFilter = POINT;
-    AddressU  = CLAMP;
-    AddressV  = CLAMP;
+    AddressU  = WRAP;
+    AddressV  = WRAP;
 };
 
 
@@ -33,18 +33,15 @@ uniform sampler ElevationSampler = sampler_state
 struct VS_INPUT
 {
 	float2 posxy     : POSITION0;
-	float2 texcoords : TEXCOORD0;
 };
 
 struct VS_OUTPUT
 {
 	float4 position  : POSITION;
-	float2 texcoords : TEXCOORD0;
 };
 
 struct PS_INPUT
 {
-	float2 texcoords : TEXCOORD0;
 	float2 vPos      : VPOS;
 };
 
@@ -63,7 +60,6 @@ VS_OUTPUT ComputeNormalsVS(VS_INPUT input)
 	VS_OUTPUT output;
 
 	output.position  = mul(WorldViewProjection, float4(input.posxy, 0.0f, 1.0f));
-	output.texcoords = input.texcoords;
 
 	return output;
 }
@@ -73,12 +69,12 @@ PS_OUTPUT ComputeNormalsPS(PS_INPUT input)
 	PS_OUTPUT output;
 	
 	// sample four points around quad face	
-	input.texcoords = input.vPos + 0.5f;
+	float2 texcoords = input.vPos + 0.5f;
 	
-	float2 texcoordTopLeft     = float2(input.texcoords.x - 0.5, input.texcoords.y - 0.5) * ElevationTextureSizeInverse;
-	float2 texcoordTopRight    = float2(input.texcoords.x + 0.5, input.texcoords.y - 0.5) * ElevationTextureSizeInverse;
-	float2 texcoordBottomLeft  = float2(input.texcoords.x - 0.5, input.texcoords.y + 0.5) * ElevationTextureSizeInverse;
-	float2 texcoordBottomRight = float2(input.texcoords.x + 0.5, input.texcoords.y + 0.5) * ElevationTextureSizeInverse;
+	float2 texcoordTopLeft     = float2(texcoords.x - 0.5, texcoords.y - 0.5) * ElevationTextureSizeInverse;
+	float2 texcoordTopRight    = float2(texcoords.x + 0.5, texcoords.y - 0.5) * ElevationTextureSizeInverse;
+	float2 texcoordBottomLeft  = float2(texcoords.x - 0.5, texcoords.y + 0.5) * ElevationTextureSizeInverse;
+	float2 texcoordBottomRight = float2(texcoords.x + 0.5, texcoords.y + 0.5) * ElevationTextureSizeInverse;
 	
 	float zTopLeft     = tex2D(ElevationSampler, texcoordTopLeft     + (0.5f * ElevationTextureSizeInverse)).x;
 	float zTopRight    = tex2D(ElevationSampler, texcoordTopRight    + (0.5f * ElevationTextureSizeInverse)).x;

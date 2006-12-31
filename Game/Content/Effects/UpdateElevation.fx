@@ -10,6 +10,12 @@ const float HeightMapSizeInverse;
 
 const float GridSpacing;
 
+const float2 WorldPosMin;
+
+const float2 ToroidalOrigin;
+
+const float ElevationTextureSize;
+
 
 //-----------------------------------------------------------------------------
 // samplers
@@ -33,18 +39,15 @@ uniform sampler HeightMapSampler = sampler_state
 struct VS_INPUT
 {
 	float2 posxy    : POSITION0;
-	float2 worldPos : TEXCOORD0;
 };
 
 struct VS_OUTPUT
 {
 	float4 position : POSITION;
-	float2 worldPos : TEXCOORD0;
 };
 
 struct PS_INPUT
 {
-	float2 worldPos : TEXCOORD0;
 	float2 vPos    : VPOS;
 };
 
@@ -63,7 +66,6 @@ VS_OUTPUT UpdateElevationFromHeightMapVS(VS_INPUT input)
 	VS_OUTPUT output;
 
 	output.position = mul(WorldViewProjection, float4(input.posxy, 0.0f, 1.0f));
-	output.worldPos = float2(input.worldPos);
 
 	return output;
 }
@@ -93,9 +95,9 @@ PS_OUTPUT UpdateElevationFromHeightMapPS(PS_INPUT input)
 {
 	PS_OUTPUT output;
 	
-	float2 texcoords = round(input.worldPos);
+	float2 texcoords = WorldPosMin + (((input.vPos - ToroidalOrigin + ElevationTextureSize) % ElevationTextureSize) * GridSpacing);
+	//float2 texcoords = WorldPosMin + (input.vPos * GridSpacing);
 	texcoords *= HeightMapSizeInverse;
-	texcoords.y = 1.0f - texcoords.y;
 	
 	// offset texture coordinates, see Directly Mapping Texels to Pixels
 	// in the DirectX SDK helpfile
@@ -106,8 +108,8 @@ PS_OUTPUT UpdateElevationFromHeightMapPS(PS_INPUT input)
 	// us a mask that can then be applied to get the correct vertices
 	float zc;
 	
-	float x = round(input.vPos.x);
-	float y = round(input.vPos.y);
+	float x = input.vPos.x;
+	float y = input.vPos.y;
 	if (x % 2 == 0.0f && y % 2 == 0.0f)
 	{
 		zc = zf;

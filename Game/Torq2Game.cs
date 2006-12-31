@@ -11,17 +11,22 @@ namespace Torq2
 	/// <summary>
 	/// This is the main type for your game
 	/// </summary>
-	partial class Torq2Game : Microsoft.Xna.Framework.Game
+	public class Torq2Game : Microsoft.Xna.Framework.Game
 	{
 		private Microsoft.Xna.Framework.GraphicsDeviceManager graphics;
 		private Microsoft.Xna.Framework.Content.ContentManager content;
 		private Torq2.Terrain.Terrain terrain;
 		private Framerate framerate1;
-		private Torq2.SimpleObjects.Cube cube1;
+		private Torq2.SimpleObjects.Vehicle cube1;
 		private Torq2.Graphics.Cameras.ICameraService camera;
 
 		private bool m_bRecordingVideo = false;
 		private AviWriter m_pAviWriter;
+
+        public GraphicsDevice GraphicsDevice
+        {
+            get { return graphics.GraphicsDevice; }
+        }
 
 		public Torq2Game()
 		{
@@ -29,7 +34,7 @@ namespace Torq2
 			this.content = new ContentManager(Services);
 			this.terrain = new Torq2.Terrain.Terrain(this);
 			this.framerate1 = new Torq2.Framerate(this);
-			this.cube1 = new Torq2.SimpleObjects.Cube(this);
+			this.cube1 = new Torq2.SimpleObjects.Vehicle(this);
 			this.camera = new Torq2.Graphics.Cameras.GodCamera(this);
 
 			this.Components.Add(this.terrain);
@@ -110,18 +115,18 @@ namespace Torq2
 			base.Draw(gameTime);
 
 			KeyboardState pKeyboardState = Keyboard.GetState();
-			if (pKeyboardState.IsKeyDown(Keys.F12))
+			if (pKeyboardState.IsKeyDown(Keys.F11))
 			{
 				TakeScreenshot();
 			}
 
-			if (pKeyboardState.IsKeyDown(Keys.F10))
+			if (pKeyboardState.IsKeyDown(Keys.F9))
 			{
 				m_bRecordingVideo = true;
 				if (m_pAviWriter != null) m_pAviWriter.Close();
 				CreateVideo();
 			}
-			else if (pKeyboardState.IsKeyDown(Keys.F11))
+			else if (pKeyboardState.IsKeyDown(Keys.F10))
 			{
 				m_bRecordingVideo = false;
 			}

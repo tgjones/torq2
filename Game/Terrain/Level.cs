@@ -30,11 +30,10 @@ namespace Torq2.Terrain
 
 		private bool m_bActive;
 
+		private IntVector2 m_tToroidalOrigin;
+
 		private RenderTarget2D m_pElevationTexture;
 		private RenderTarget2D m_pNormalMapTexture;
-
-		private VertexBuffer m_pQuadVertexBuffer;
-		private IndexBuffer m_pQuadIndexBuffer;
 
 		private EffectWrapper m_pNormalMapUpdateEffect;
 		private EffectWrapper m_pElevationUpdateEffect;
@@ -117,6 +116,9 @@ namespace Torq2.Terrain
 			m_pEdgeStitches = new EdgeStitches(m_nGridSpacing);
 
 			m_bActive = true;
+
+			//m_tToroidalOrigin = new IntVector2(1, 1);
+			m_tToroidalOrigin = IntVector2.Zero;
 		}
 
 		#endregion
@@ -290,6 +292,9 @@ namespace Torq2.Terrain
 			m_pElevationUpdateEffect.SetValue("HeightMapTexture", m_pParentTerrain.HeightMapTexture);
 			m_pElevationUpdateEffect.SetValue("HeightMapSizeInverse", 1.0f / (float) m_pParentTerrain.HeightMapTexture.Width);
 			m_pElevationUpdateEffect.SetValue("GridSpacing", (float) m_nGridSpacing);
+			m_pElevationUpdateEffect.SetValue("WorldPosMin", (Vector2) m_tPositionMin);
+			m_pElevationUpdateEffect.SetValue("ToroidalOrigin", m_tToroidalOrigin);
+			m_pElevationUpdateEffect.SetValue("ElevationTextureSize", Settings.ELEVATION_TEXTURE_SIZE);
 			m_pElevationUpdateEffect.Render(new RenderCallback(RenderElevationTexture));
 
 			pGraphicsDevice.ResolveRenderTarget(0);
@@ -308,24 +313,17 @@ namespace Torq2.Terrain
 
 			TextureVertex[] pVertices = new TextureVertex[4];
 
-			float fOffsetX = (Settings.GRID_SIZE_N + 1) * m_nGridSpacing;
-			float fOffsetY = fOffsetX;
-
 			// (-1, -1)
-			pVertices[0] = new TextureVertex(new Vector2(fMinVertexX, fMinVertexY),
-				new Vector2(m_tPositionMin.X, m_tPositionMin.Y + fOffsetY));
+			pVertices[0] = new TextureVertex(new Vector2(fMinVertexX, fMinVertexY));
 
 			// (-1, 1)
-			pVertices[1] = new TextureVertex(new Vector2(fMinVertexX, fMaxVertexY),
-				new Vector2(m_tPositionMin.X, m_tPositionMin.Y));
+			pVertices[1] = new TextureVertex(new Vector2(fMinVertexX, fMaxVertexY));
 
 			// (1, -1)
-			pVertices[2] = new TextureVertex(new Vector2(fMaxVertexX, fMinVertexY),
-				new Vector2(m_tPositionMin.X + fOffsetX, m_tPositionMin.Y + fOffsetY));
+			pVertices[2] = new TextureVertex(new Vector2(fMaxVertexX, fMinVertexY));
 
 			// (1, 1)
-			pVertices[3] = new TextureVertex(new Vector2(fMaxVertexX, fMaxVertexY),
-				new Vector2(m_tPositionMin.X + fOffsetX, m_tPositionMin.Y));
+			pVertices[3] = new TextureVertex(new Vector2(fMaxVertexX, fMaxVertexY));
 
 			pEffect.GraphicsDevice.DrawUserPrimitives<TextureVertex>(
 				PrimitiveType.TriangleStrip,
@@ -373,24 +371,17 @@ namespace Torq2.Terrain
 
 			TextureVertex[] pVertices = new TextureVertex[4];
 
-			float fOffsetX = Settings.GRID_SIZE_N + 0.5f;
-			float fOffsetY = fOffsetX;
-
 			// (-1, -1)
-			pVertices[0] = new TextureVertex(new Vector2(fMinVertexX, fMinVertexY),
-				new Vector2(0.5f, fOffsetY));
+			pVertices[0] = new TextureVertex(new Vector2(fMinVertexX, fMinVertexY));
 
 			// (-1, 1)
-			pVertices[1] = new TextureVertex(new Vector2(fMinVertexX, fMaxVertexY),
-				new Vector2(0.5f));
+			pVertices[1] = new TextureVertex(new Vector2(fMinVertexX, fMaxVertexY));
 
 			// (1, -1)
-			pVertices[2] = new TextureVertex(new Vector2(fMaxVertexX, fMinVertexY),
-				new Vector2(fOffsetX, fOffsetY));
+			pVertices[2] = new TextureVertex(new Vector2(fMaxVertexX, fMinVertexY));
 
 			// (1, 1)
-			pVertices[3] = new TextureVertex(new Vector2(fMaxVertexX, fMaxVertexY),
-				new Vector2(fOffsetX, 0.5f));
+			pVertices[3] = new TextureVertex(new Vector2(fMaxVertexX, fMaxVertexY));
 
 			pEffect.GraphicsDevice.DrawUserPrimitives<TextureVertex>(
 				PrimitiveType.TriangleStrip,
@@ -398,6 +389,8 @@ namespace Torq2.Terrain
 		}
 
 		#endregion
+
+		#region Render methods
 
 		public void Render(EffectWrapper pEffect)
 		{
@@ -408,6 +401,8 @@ namespace Torq2.Terrain
 			pEffect.SetValue("AlphaOffset", Settings.AlphaOffset);
 			pEffect.SetValue("OneOverWidth", Settings.TransitionWidthInverse);
 			pEffect.SetValue("GridSize", Settings.GRID_SIZE_N);
+
+			pEffect.SetValue("GrassTexture", m_pParentTerrain.GrassTexture);
 
 			pEffect.SetValue("NormalMapTexture", m_pNormalMapTexture.GetTexture());
 
@@ -421,6 +416,11 @@ namespace Torq2.Terrain
 			pEffect.SetValue("NormalMapTextureSize", Settings.NORMAL_MAP_TEXTURE_SIZE);
 
 			pEffect.SetValue("LightDirection", Vector3.Normalize(new Vector3(0.0f, 0.0f, 1)));
+
+			Vector2 tToroidalOriginScaled = (Vector2) m_tToroidalOrigin / (float) Settings.ELEVATION_TEXTURE_SIZE;
+			Vector2 tGridSizeScaled = new Vector2(((float) Settings.GRID_SIZE_N / (float) Settings.ELEVATION_TEXTURE_SIZE));
+			pEffect.SetValue("ToroidalOffsets", new Vector4(tToroidalOriginScaled, tGridSizeScaled.X, tGridSizeScaled.Y));
+			pEffect.SetValue("ElevationTextureSize", Settings.ELEVATION_TEXTURE_SIZE);
 
 			#region Render blocks
 
@@ -492,11 +492,6 @@ namespace Torq2.Terrain
 			#endregion
 		}
 
-		public void RenderElevationTexture(GraphicsDevice pGraphicsDevice)
-		{
-			UpdateElevationTexture(pGraphicsDevice);
-		}
-
 		public void RenderBlocks(EffectWrapper pEffect)
 		{
 			foreach (Block pBlock in m_pBlocks)
@@ -512,6 +507,8 @@ namespace Torq2.Terrain
 				pBlock.Render(pEffect);
 			}
 		}
+
+		#endregion
 
 		#endregion
 	}

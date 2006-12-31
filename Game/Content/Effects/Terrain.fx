@@ -64,6 +64,14 @@ const float NormalMapTextureSize;
 
 const float NormalMapTextureSizeInverse;
 
+const texture GrassTexture;
+
+// ToroidalOffsets.xy: toroidal origin in texture coordinates
+// ToroidalOffsets.zw: size of grid inside texture, used for modulation
+const float4 ToroidalOffsets;
+
+const float ElevationTextureSize;
+
 
 //-----------------------------------------------------------------------------
 // samplers
@@ -87,8 +95,8 @@ sampler_state
 	MipFilter = NONE;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
-	AddressU = CLAMP;
-	AddressV = CLAMP;
+	AddressU = WRAP;
+	AddressV = WRAP;
 };
 
 sampler CoarserNormalMapSampler = 
@@ -98,8 +106,19 @@ sampler_state
 	MipFilter = NONE;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
-	AddressU = CLAMP;
-	AddressV = CLAMP;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+sampler GrassSampler = 
+sampler_state
+{
+	Texture = <GrassTexture>;
+	MipFilter = ANISOTROPIC;
+	MinFilter = ANISOTROPIC;
+	MagFilter = ANISOTROPIC;
+	AddressU = WRAP;
+	AddressV = WRAP;
 };
 
 
@@ -117,6 +136,7 @@ struct VS_OUTPUT
 	float4 position : POSITION;
 	float2 uv       : TEXCOORD0;
 	float2 alpha    : TEXCOORD1;
+	float2 worldPos : TEXCOORD2;
 	float4 colour   : COLOR;
 };
 
@@ -139,8 +159,9 @@ VS_OUTPUT VS(VS_INPUT IN)
 	
 	// compute coordinates for vertex texture
 	float2 uv = (IN.posxy * FineBlockOrig.xy) + FineBlockOrig.zw;
+	float2 offsetUv = uv + ToroidalOffsets.xy;
 	
-	float4 elevationFineCoarse = tex2Dlod(ElevationSampler, float4(uv, 0, 0));
+	float4 elevationFineCoarse = tex2Dlod(ElevationSampler, float4(offsetUv + (0.5f / ElevationTextureSize), 0, 0));
 	float zf = elevationFineCoarse.x;
 	float zc = elevationFineCoarse.y;
 	float zd = zc - zf;
@@ -160,6 +181,8 @@ VS_OUTPUT VS(VS_INPUT IN)
 	
 	OUT.colour = float4(alpha.x, 0, 0, 1);
 	
+	OUT.worldPos = worldPos;
+	
 	return OUT;
 }
 
@@ -168,12 +191,12 @@ PS_OUTPUT PS(VS_OUTPUT IN)
 	PS_OUTPUT OUT;
 	
 	// get fine normal
-	float2 normalf = tex2D(NormalMapSampler, IN.uv).xy;
+	float2 normalf = tex2D(NormalMapSampler, IN.uv + ToroidalOffsets.xy).xy;
 	
 	// get coarse normal
 	float2 texcoordc = ((IN.uv * NormalMapTextureSize) / 2.0) + CoarserNormalMapTextureOffset;
 	texcoordc *= NormalMapTextureSizeInverse;
-	float2 normalc = tex2D(CoarserNormalMapSampler, texcoordc).xy;
+	float2 normalc = tex2D(CoarserNormalMapSampler, texcoordc + ToroidalOffsets.xy).xy;
 	
 	float3 normal = float3(((1 - IN.alpha.x) * normalf) + (IN.alpha.x * normalc), 1.0);
 
@@ -183,8 +206,10 @@ PS_OUTPUT PS(VS_OUTPUT IN)
 	// compute simple diffuse lighting
 	float s = clamp(dot(normal, LightDirection), 0, 1);
 	float4 ambient = float4(0.7f, 0.7f, 0.8f, 1);
-	float4 material = float4(0.4f, 0.5f, 0.4f, 1);
+	//float4 material = float4(0.4f, 0.5f, 0.4f, 1);
+	float4 material = tex2D(GrassSampler, IN.worldPos / 4);
 	OUT.colour = float4(s, s, s, 1) * 0.2f + ambient * 0.1f + material * 0.7f;
+	//OUT.colour = Shading;
 
 	return OUT;
 }
@@ -193,7 +218,7 @@ PS_OUTPUT PS_2(VS_OUTPUT IN)
 {
 	PS_OUTPUT OUT;
 	
-	OUT.colour = float4(1, 0, 0, 0.1);
+	OUT.colour = float4(1, 0, 0, 0.7);
 	
 	return OUT;
 }
@@ -207,6 +232,7 @@ technique
 {
 	pass Pass0
 	{
+		ZEnable = true;
 		//FillMode = WIREFRAME;
 		VertexShader = compile vs_3_0 VS();
 		PixelShader = compile ps_2_0 PS();

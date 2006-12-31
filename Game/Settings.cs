@@ -45,7 +45,7 @@ namespace Torq2
 		/// <summary>
 		/// Used to create the textures for each level that store the elevation data
 		/// </summary>
-		public const short ELEVATION_TEXTURE_SIZE = GRID_SIZE_N + 1;
+		public const short ELEVATION_TEXTURE_SIZE = GRID_SIZE_N;
 
 		/// <summary>
 		/// This value is regularly used so it's here as a convenience and an optimisation.

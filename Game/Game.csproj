@@ -43,7 +43,6 @@
     <Reference Include="Microsoft.Xna.Framework">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f48fa5f25d27e8ff, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game">
       <Private>False</Private>
     </Reference>
@@ -86,6 +85,10 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>EdgeStitches</Name>
     </Compile>
+    <Compile Include="Terrain\Sky.cs">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Name>Sky</Name>
+    </Compile>
     <Compile Include="Torq2Game.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>Torq2Game</Name>
@@ -119,9 +122,9 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>Program</Name>
     </Compile>
-    <Compile Include="ResourceLoader.cs">
+    <Compile Include="AssetLoader.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
-      <Name>ResourceLoader</Name>
+      <Name>AssetLoader</Name>
     </Compile>
     <Compile Include="SceneObject.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
@@ -131,9 +134,9 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>Settings</Name>
     </Compile>
-    <Compile Include="SimpleObjects\Cube.cs">
+    <Compile Include="SimpleObjects\Vehicle.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
-      <Name>Cube</Name>
+      <Name>Vehicle</Name>
     </Compile>
     <Compile Include="Terrain\Block.cs">
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
@@ -219,6 +222,52 @@
       <XNAUseContentPipeline>false</XNAUseContentPipeline>
       <Name>SimpleLoop</Name>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Terrains\Grass.dds">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Importer>TextureImporter</Importer>
+      <Processor>SpriteTextureProcessor</Processor>
+      <Name>Grass</Name>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Terrains\Grass2.dds">
+      <XNAUseContentPipeline>false</XNAUseContentPipeline>
+      <Importer>TextureImporter</Importer>
+      <Processor>SpriteTextureProcessor</Processor>
+      <Name>Grass2</Name>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Models\SkyUnitDome.x">
+      <XNAUseContentPipeline>true</XNAUseContentPipeline>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Name>SkyUnitDome</Name>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Effects\Sky.fx">
+      <XNAUseContentPipeline>true</XNAUseContentPipeline>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Name>Sky</Name>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Models\ToyotaBody.x">
+      <XNAUseContentPipeline>true</XNAUseContentPipeline>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Name>ToyotaBody</Name>
+    </Content>
+    <Content Include="Content\Models\ToyotaWheel.x">
+      <XNAUseContentPipeline>true</XNAUseContentPipeline>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Name>ToyotaWheel</Name>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

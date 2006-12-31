@@ -97,5 +97,22 @@ namespace Torq2
 		}
 
 		#endregion
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+				return false;
+
+			if (!(obj is IntVector2))
+				return false;
+
+			IntVector2 lValue = (IntVector2) obj;
+			return (X == lValue.X && Y == lValue.Y);
+		}
+
+		public override int GetHashCode()
+		{
+			return X ^ Y;
+		}
 	}
 }

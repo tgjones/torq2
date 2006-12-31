@@ -14,7 +14,6 @@ namespace Torq2.Terrain
 	public struct TextureVertex
 	{
 		public Vector2 Position;
-		public Vector2 WorldPos;
 
 		public unsafe static int SizeInBytes
 		{
@@ -24,18 +23,16 @@ namespace Torq2.Terrain
 		public static readonly VertexElement[] VertexElements = new VertexElement[]
 		{
 			new VertexElement(0, 0, VertexElementFormat.Vector2, VertexElementMethod.Default, VertexElementUsage.Position, 0),
-			new VertexElement(0, 8, VertexElementFormat.Vector2, VertexElementMethod.Default, VertexElementUsage.TextureCoordinate, 0),
 		};
 
-		public TextureVertex(Vector2 tPosition, Vector2 tWorldPos)
+		public TextureVertex(Vector2 tPosition)
 		{
 			Position = tPosition;
-			WorldPos = tWorldPos;
 		}
 
 		public override string ToString()
 		{
-			return "Pos: " + Position + "; WorldPos: " + WorldPos;
+			return "Pos: " + Position;
 		}
 	}
 }

@@ -16,6 +16,8 @@ namespace Torq2.Terrain
 		private GraphicsDevice m_pGraphicsDevice;
 
 		private Level[] m_pLevels;
+		private Sky m_pSky;
+
 		private IntVector2 m_tPreviousViewerPosition;
 
 		private ITerrainViewer m_pViewer;
@@ -23,6 +25,8 @@ namespace Torq2.Terrain
 		private ElevationData m_pElevationData;
 
 		private SpriteBatch m_pLevelHeightMap;
+
+		private Texture2D m_pGrassTexture;
 
 		public EffectWrapper Effect
 		{
@@ -45,6 +49,11 @@ namespace Torq2.Terrain
 			get { return this.Game; }
 		}
 
+		public Texture2D GrassTexture
+		{
+			get { return m_pGrassTexture; }
+		}
+
 		static Terrain()
 		{
 			// set vertex definition
@@ -54,15 +63,18 @@ namespace Torq2.Terrain
 			};
 		}
 
-		public Terrain(Game game) : base(game)
+		public Terrain(Game pGame)
+			: base(pGame)
 		{
-			const int NUM_LEVELS = 11;
+			const int NUM_LEVELS = 5;
 			m_pLevels = new Level[NUM_LEVELS];
 			int nCounter = 0;
 			for (int i = NUM_LEVELS - 1; i >= 0; i--)
 			{
 				m_pLevels[nCounter++] = new Level(this, Maths.Pow(2, i));
 			}
+
+			m_pSky = new Sky((Torq2Game) pGame);
 		}
 
 		protected override void LoadGraphicsContent(bool loadAllContent)
@@ -95,10 +107,14 @@ namespace Torq2.Terrain
 				pLevel.Create2(m_pGraphicsDevice);
 			}
 
+			m_pSky.Create(m_pGraphicsDevice);
+
 			m_pTextWriter = new BitmapFont("Content/Fonts/LucidaConsole10.xml");
 			m_pTextWriter.Reset(this.GraphicsDevice);
 
 			m_pLevelHeightMap = new SpriteBatch(m_pGraphicsDevice);
+
+			m_pGrassTexture = Texture2D.FromFile(m_pGraphicsDevice, @"Content\Terrains\Grass.dds");
 
 			base.LoadGraphicsContent(loadAllContent);
 		}
@@ -135,6 +151,8 @@ namespace Torq2.Terrain
 			{
 				pLevel.Render(m_pEffect);
 			}
+
+			m_pSky.Render(m_pGraphicsDevice);
 		}
 	}
 }
