@@ -72,7 +72,7 @@ VS_OUTPUT UpdateElevationFromHeightMapVS(VS_INPUT input)
 
 float LookupHeight(float2 texcoord)
 {
-	return tex2D(HeightMapSampler, texcoord + (0.5f * HeightMapSizeInverse)).x * 100.0f;// * 65535.0f;
+	return tex2D(HeightMapSampler, texcoord + (0.5f * HeightMapSizeInverse)).x / 10000;// / 65535.0f;
 }
 
 float CalculateAverageHeight(float2 texcoord1, float2 texcoord2)

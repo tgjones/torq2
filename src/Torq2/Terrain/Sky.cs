@@ -30,9 +30,9 @@ namespace Torq2.Terrain
 
 		public void Create(GraphicsDevice pGraphicsDevice)
 		{
-			m_pSkyDomeModel = AssetLoader.LoadAsset<Model>(@"Content\Models\SkyUnitDome", m_pGame, pGraphicsDevice);
+			m_pSkyDomeModel = AssetLoader.LoadAsset<Model>(@"Models\SkyUnitDome", m_pGame, pGraphicsDevice);
 
-			m_pEffect = new EffectWrapper(m_pGame, pGraphicsDevice, @"Content\Effects\Sky");
+			m_pEffect = new EffectWrapper(m_pGame, pGraphicsDevice, @"Effects\Sky");
 		}
 
 		public void Render(GraphicsDevice pGraphicsDevice)
@@ -51,7 +51,7 @@ namespace Torq2.Terrain
 			m_pEffect.Render(new RenderCallback(RenderSky));
 		}
 
-		private void RenderSky(EffectWrapper pEffect)
+		private void RenderSky(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			ModelMeshPart meshPart = m_pSkyDomeModel.Meshes[0].MeshParts[0];
 

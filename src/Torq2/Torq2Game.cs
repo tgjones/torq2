@@ -10,24 +10,18 @@ namespace Torq2
 	/// <summary>
 	/// This is the main type for your game
 	/// </summary>
-	public class Torq2Game : Microsoft.Xna.Framework.Game
+	public class Torq2Game : Game
 	{
 		private Microsoft.Xna.Framework.GraphicsDeviceManager graphics;
-		private Microsoft.Xna.Framework.Content.ContentManager content;
 		private Torq2.Terrain.Terrain terrain;
 		private Framerate framerate1;
 		private Torq2.SimpleObjects.Vehicle cube1;
 		private Torq2.Graphics.Cameras.ICameraService camera;
 
-		public GraphicsDevice GraphicsDevice
-		{
-			get { return graphics.GraphicsDevice; }
-		}
-
 		public Torq2Game()
 		{
 			this.graphics = new Microsoft.Xna.Framework.GraphicsDeviceManager(this);
-			this.content = new ContentManager(Services);
+			Content.RootDirectory = "Content";
 			this.terrain = new Torq2.Terrain.Terrain(this);
 			this.framerate1 = new Torq2.Framerate(this);
 			this.cube1 = new Torq2.SimpleObjects.Vehicle(this);
@@ -37,7 +31,7 @@ namespace Torq2
 			this.Components.Add(this.framerate1);
 			this.Components.Add(this.cube1);
 
-			this.Services.AddService(typeof(ContentManager), content);
+			this.Services.AddService(typeof(ContentManager), Content);
 			this.Services.AddService(typeof(Torq2.Graphics.Cameras.ICameraService), camera);
 		}
 

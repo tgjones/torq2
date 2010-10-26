@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Torq2.Graphics;
@@ -164,21 +165,21 @@ namespace Torq2.Terrain
 				Settings.ELEVATION_TEXTURE_SIZE,
 				Settings.ELEVATION_TEXTURE_SIZE,
 				false,
-				SurfaceFormat.Vector4,
-				DepthFormat.Depth24);
+				SurfaceFormat.Vector2,
+				DepthFormat.None);
 
 			m_pNormalMapTexture = new RenderTarget2D(pGraphicsDevice,
 				Settings.NORMAL_MAP_TEXTURE_SIZE,
 				Settings.NORMAL_MAP_TEXTURE_SIZE,
 				false,
 				SurfaceFormat.HalfVector2,
-				DepthFormat.Depth24);
+				DepthFormat.None);
 
 			m_pNormalMapUpdateEffect = new EffectWrapper(m_pParentTerrain.ParentGame, pGraphicsDevice,
-				@"Content\Effects\ComputeNormals");
+				@"Effects\ComputeNormals");
 
 			m_pElevationUpdateEffect = new EffectWrapper(m_pParentTerrain.ParentGame, pGraphicsDevice,
-				@"Content\Effects\UpdateElevation");
+				@"Effects\UpdateElevation");
 		}
 
 		public void Create2(GraphicsDevice pGraphicsDevice)
@@ -273,7 +274,7 @@ namespace Torq2.Terrain
 		private void UpdateElevationTexture(GraphicsDevice pGraphicsDevice)
 		{
 			// TODO: currently we just update the whole texture. we need to do this toroidally
-			RenderTarget2D pSavedSurface = (RenderTarget2D) pGraphicsDevice.GetRenderTargets()[0].RenderTarget;
+			RenderTargetBinding[] pSavedSurfaces = pGraphicsDevice.GetRenderTargets();
 
 			pGraphicsDevice.SetRenderTarget(m_pElevationTexture);
 
@@ -291,14 +292,19 @@ namespace Torq2.Terrain
 			m_pElevationUpdateEffect.SetValue("WorldPosMin", (Vector2) m_tPositionMin);
 			m_pElevationUpdateEffect.SetValue("ToroidalOrigin", m_tToroidalOrigin);
 			m_pElevationUpdateEffect.SetValue("ElevationTextureSize", Settings.ELEVATION_TEXTURE_SIZE);
-			m_pElevationUpdateEffect.Render(new RenderCallback(RenderElevationTexture));
+			m_pElevationUpdateEffect.Render(RenderElevationTexture);
 
-			pGraphicsDevice.SetRenderTarget(pSavedSurface);
+			pGraphicsDevice.SetRenderTargets(pSavedSurfaces);
 
-			//m_pElevationTexture.GetTexture().Save("Level " + m_nGridSpacing + ".dds", ImageFileFormat.Dds);
+			/*using (Stream pFileStream = File.OpenWrite("Level " + m_nGridSpacing + ".png"))
+			{
+				m_pElevationTexture.SaveAsPng(pFileStream,
+					Settings.ELEVATION_TEXTURE_SIZE,
+					Settings.ELEVATION_TEXTURE_SIZE);
+			}*/
 		}
 
-		private void RenderElevationTexture(EffectWrapper pEffect)
+		private static void RenderElevationTexture(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			float fMinVertexX = 0.0f;
 			float fMaxVertexX = Settings.ELEVATION_TEXTURE_SIZE;
@@ -354,7 +360,7 @@ namespace Torq2.Terrain
 			//m_pNormalMapTexture.GetTexture().Save("NormalMap " + m_nGridSpacing + ".dds", ImageFileFormat.Dds);
 		}
 
-		private void RenderNormalMapTexture(EffectWrapper pEffect)
+		private void RenderNormalMapTexture(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			float fMinVertexX = 0.0f;
 			float fMaxVertexX = Settings.NORMAL_MAP_TEXTURE_SIZE - 1;
@@ -478,19 +484,19 @@ namespace Torq2.Terrain
 			#endregion
 		}
 
-		public void RenderBlocks(EffectWrapper pEffect)
+		private void RenderBlocks(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			foreach (Block pBlock in m_pBlocks)
 			{
-				pBlock.Render(pEffect);
+				pBlock.Render(pEffect, pEffectPass);
 			}
 		}
 
-		public void RenderCentreBlocks(EffectWrapper pEffect)
+		private void RenderCentreBlocks(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			foreach (Block pBlock in m_pCentreBlocks)
 			{
-				pBlock.Render(pEffect);
+				pBlock.Render(pEffect, pEffectPass);
 			}
 		}
 

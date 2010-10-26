@@ -90,10 +90,13 @@ namespace Torq2
 		{
 			this.currentFramerate = 0;
 			this.windowTitle = String.Empty;
+
+			base.Initialize();
 		}
 
 		protected override void LoadContent()
 		{
+			m_pTextFont = Game.Content.Load<SpriteFont>(@"Fonts\LucidaConsole");
 			m_pSpriteBatch = new SpriteBatch(GraphicsDevice);
 			base.LoadContent();
 		}
@@ -132,7 +135,10 @@ namespace Torq2
 			if (this.Visible)
 			{
 				string currentFramerateString = this.showDecimals ? this.currentFramerate.ToString(this.displayFormat) : ((int) this.currentFramerate).ToString("D");
+
+				m_pSpriteBatch.Begin();
 				m_pSpriteBatch.DrawString(m_pTextFont, "FPS: " + currentFramerateString, new Vector2(10, 10), Color.White);
+				m_pSpriteBatch.End();
 			}
 		}
 

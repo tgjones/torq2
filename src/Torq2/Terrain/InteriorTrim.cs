@@ -338,7 +338,7 @@ namespace Torq2.Terrain
 			pEffect.Render(new RenderCallback(RenderInteriorTrim));
 		}
 
-		public void RenderInteriorTrim(EffectWrapper pEffect)
+		private void RenderInteriorTrim(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			pEffect.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleStrip,
 				0,                                      // base vertex

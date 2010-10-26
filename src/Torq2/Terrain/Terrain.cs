@@ -72,7 +72,7 @@ namespace Torq2.Terrain
 			m_pGraphicsDevice = this.GraphicsDevice;
 
 			m_pEffect = new EffectWrapper(this.Game, m_pGraphicsDevice,
-				@"Content\Effects\Terrain");
+				@"Effects\Terrain");
 
 			m_pElevationData = new ElevationData(this.Game, m_pGraphicsDevice, @"Content\Terrains\SimpleLoop");
 
@@ -96,11 +96,11 @@ namespace Torq2.Terrain
 
 			m_pSky.Create(m_pGraphicsDevice);
 
-			m_pTextFont = Game.Content.Load<SpriteFont>("Fonts/LucidaConsole.xml");
+			m_pTextFont = Game.Content.Load<SpriteFont>(@"Fonts\LucidaConsole");
 
 			m_pLevelHeightMap = new SpriteBatch(m_pGraphicsDevice);
 
-			m_pGrassTexture = Game.Content.Load<Texture2D>(@"Terrains\Grass.dds");
+			m_pGrassTexture = Game.Content.Load<Texture2D>(@"Terrains\Grass");
 
 			base.LoadContent();
 		}
@@ -139,6 +139,10 @@ namespace Torq2.Terrain
 			}
 
 			m_pSky.Render(m_pGraphicsDevice);
+
+			//m_pLevelHeightMap.Begin();
+			//m_pLevelHeightMap.Draw(m_pLevels[0].ElevationTexture, Vector2.Zero, Color.White);
+			//m_pLevelHeightMap.End();
 		}
 	}
 }

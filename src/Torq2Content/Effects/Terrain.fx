@@ -82,8 +82,8 @@ sampler_state
 {
 	Texture = <ElevationTexture>;
 	MipFilter = NONE;
-	MinFilter = POINT;
-	MagFilter = POINT;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
 	AddressU = WRAP;
 	AddressV = WRAP;
 };
@@ -161,7 +161,7 @@ VS_OUTPUT VS(VS_INPUT IN)
 	float2 uv = (IN.posxy * FineBlockOrig.xy) + FineBlockOrig.zw;
 	float2 offsetUv = uv + ToroidalOffsets.xy;
 	
-	float4 elevationFineCoarse = tex2Dlod(ElevationSampler, float4(offsetUv + (0.5f / ElevationTextureSize), 0, 0));
+	float2 elevationFineCoarse = tex2Dlod(ElevationSampler, float4(offsetUv + (0.5f / ElevationTextureSize), 0, 0));
 	float zf = elevationFineCoarse.x;
 	float zc = elevationFineCoarse.y;
 	float zd = zc - zf;
@@ -235,7 +235,7 @@ technique
 		ZEnable = true;
 		//FillMode = WIREFRAME;
 		VertexShader = compile vs_3_0 VS();
-		PixelShader = compile ps_2_0 PS();
+		PixelShader = compile ps_3_0 PS();
 	}
 	
 	/*pass Pass1
@@ -244,6 +244,6 @@ technique
 		//ZEnable = false;
 		
 		VertexShader = compile vs_3_0 VS();
-		PixelShader = compile ps_2_0 PS_2();
+		PixelShader = compile ps_3_0 PS_2();
 	}*/
 }

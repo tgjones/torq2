@@ -5,7 +5,7 @@ using Torq2.Graphics;
 
 namespace Torq2.Terrain
 {
-	public class Block : SceneObject
+	public class Block
 	{
 		#region Fields
 
@@ -60,7 +60,7 @@ namespace Torq2.Terrain
 
 		#region Start methods
 
-		public override void Create(GraphicsDevice pGraphicsDevice)
+		public void Create(GraphicsDevice pGraphicsDevice)
 		{
 			// only create shared buffers once
 			if (m_pSharedIndexBuffer == null)
@@ -165,14 +165,14 @@ namespace Torq2.Terrain
 
 		#region Draw methods
 
-		public override void Render(EffectWrapper pEffect)
+		public void Render(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			if (m_bVisible)
 			{
 				pEffect.SetValue("FineBlockOrig", m_tFineBlockOrig);
 				pEffect.SetValue("FineBlockOrig2", m_tFineBlockOrig2);
 				pEffect.SetValue("ScaleFactor", m_tScaleFactor);
-				//pEffect.CommitChanges(); // TODO
+				pEffectPass.Apply();
 
 				// render
 				pEffect.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleStrip,

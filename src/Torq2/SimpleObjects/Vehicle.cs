@@ -104,8 +104,8 @@ namespace Torq2.SimpleObjects
             m_tVelocity = new Vector3(0, 0, 0);
 
             // Initialise graphics
-            m_pBodyModel = AssetLoader.LoadAsset<Model>(@"Content\Models\ToyotaBody", m_pGame, m_pGame.GraphicsDevice);
-            m_pWheelModel = AssetLoader.LoadAsset<Model>(@"Content\Models\ToyotaWheel", m_pGame, m_pGame.GraphicsDevice);
+            m_pBodyModel = AssetLoader.LoadAsset<Model>(@"Models\ToyotaBody", m_pGame, m_pGame.GraphicsDevice);
+            m_pWheelModel = AssetLoader.LoadAsset<Model>(@"Models\ToyotaWheel", m_pGame, m_pGame.GraphicsDevice);
         }
 
         public override void Update(GameTime gameTime)
@@ -157,7 +157,7 @@ namespace Torq2.SimpleObjects
                     effect.Projection = pCamera.ProjectionMatrix;
                     effect.World = Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateTranslation(m_tPosition);                    
                     effect.EnableDefaultLighting();
-                    pGraphicsDevice.RasterizerState = RasterizerState.CullNone;
+                    pGraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
                     mesh.Draw();
                 }
@@ -182,7 +182,7 @@ namespace Torq2.SimpleObjects
                                 Matrix.CreateTranslation(m_tPosition + m_pAxles[i].Wheels[j].Position);
 
                             effect.EnableDefaultLighting();
-														pGraphicsDevice.RasterizerState = RasterizerState.CullNone;
+														pGraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
                             mesh.Draw();
                         }

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Torq2.Graphics
 {
-	public delegate void RenderCallback(EffectWrapper pEffect);
+	public delegate void RenderCallback(EffectWrapper pEffect, EffectPass pEffectPass);
 
 	/// <summary>
 	/// Summary description for EffectInstance.
@@ -106,7 +106,7 @@ namespace Torq2.Graphics
 				pEffectPass.Apply();
 
 				// render
-				pRenderCallback(this);
+				pRenderCallback(this, pEffectPass);
 			}
 		}
 

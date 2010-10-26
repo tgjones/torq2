@@ -129,11 +129,11 @@ technique
 		PixelShader = compile ps_2_0 PS();
 	}
 	
-	pass Pass1
+	/*pass Pass1
 	{
 		ZEnable = true;
 		FillMode = WIREFRAME;
 		VertexShader = compile vs_2_0 VS();
 		PixelShader = compile ps_2_0 PS2();
-	}
+	}*/
 }

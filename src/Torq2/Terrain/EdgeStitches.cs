@@ -134,7 +134,7 @@ namespace Torq2.Terrain
 			pEffect.Render(new RenderCallback(RenderEdgeStitches));
 		}
 
-		public void RenderEdgeStitches(EffectWrapper pEffect)
+		private void RenderEdgeStitches(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			pEffect.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleStrip,
 				0,                                      // base vertex

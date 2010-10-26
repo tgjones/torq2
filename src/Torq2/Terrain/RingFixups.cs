@@ -258,7 +258,7 @@ namespace Torq2.Terrain
 			pEffect.Render(new RenderCallback(RenderRingFixups));
 		}
 
-		public void RenderRingFixups(EffectWrapper pEffect)
+		private void RenderRingFixups(EffectWrapper pEffect, EffectPass pEffectPass)
 		{
 			pEffect.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleStrip,
 				0,                                   // base vertex
