@@ -1,28 +1,27 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Torq2")]
-[assembly: AssemblyProduct("Torq2")]
+[assembly: AssemblyTitle("Test")]
+[assembly: AssemblyProduct("Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
+
+[assembly: AssemblyCopyright("Copyright ©  2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type. Only Windows
-// assemblies support COM.
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// On Windows, the following GUID is for the ID of the typelib if this
-// project is exposed to COM. On other platforms, it unique identifies the
-// title storage container when deploying this assembly to the device.
-[assembly: Guid("36ca9379-7405-41c2-97d8-88d577c1f993")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("0984dfa2-2f77-4c2e-9233-386ff5c6aad6")]
+
 
 // Version information for an assembly consists of the following four values:
 //
